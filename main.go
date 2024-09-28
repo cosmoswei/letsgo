@@ -1,6 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"database/sql"
+	_ "database/sql"
+	"fmt"
+	"log"
+	"net/http"
+	"time"
+)
 
 var name string = " lisi"
 
@@ -30,7 +37,7 @@ const (
 )
 const xxxx = "zsdsaczxc"
 
-func main() {
+func demo() {
 	fmt.Println("Hello World")
 
 	var name = "huangxuwei"
@@ -86,6 +93,7 @@ func main() {
 	fmt.Println(slice)
 
 }
+
 func swap(a, b int) (int, int) {
 	return b, a
 }
@@ -112,4 +120,58 @@ func sum(nums ...int) int {
 
 func zkx() (int, int) {
 	return 1, 2
+}
+
+func main() {
+	httpServer(8090)
+}
+
+func httpServer(port int) {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Hello, you've requested: %s\n", r.URL.Path)
+	})
+
+	http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+}
+
+func operDateBase() {
+	db, err := sql.Open("mySQl", "root:root@tcp(127.0.0.1:3306)/test?charset=utf8")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	if err := db.Ping(); err != nil {
+		log.Fatal(err)
+	}
+
+	{
+		query := `
+            CREATE TABLE users (
+                id INT AUTO_INCREMENT,
+                username TEXT NOT NULL,
+                password TEXT NOT NULL,
+                created_at DATETIME,
+                PRIMARY KEY (id)
+            );`
+		if _, err := db.Exec(query); err != nil {
+			log.Fatal(err)
+		}
+
+		{ // Insert a new user
+			username := "johndoe"
+			password := "secret"
+			createdAt := time.Now()
+
+			result, err := db.Exec(`INSERT INTO users (username, password, created_at) VALUES (?, ?, ?)`, username, password, createdAt)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			id, err := result.LastInsertId()
+			fmt.Println(id)
+		}
+
+	}
+
 }
