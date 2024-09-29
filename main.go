@@ -125,7 +125,7 @@ func zkx() (int, int) {
 }
 
 func main() {
-	ConcurrencySafe()
+	MutliChannel()
 }
 
 func httpServer(port int) {
