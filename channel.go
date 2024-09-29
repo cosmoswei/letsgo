@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sync"
+	"time"
 )
 
 func Channel() {
@@ -51,7 +52,7 @@ func MutliChannel() {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
-			for j := 0; j < 20; j++ {
+			for j := 0; j < 5; j++ {
 				value := <-ch // 接收数据
 				fmt.Printf("Consumer %d received: %d\n", id, value)
 			}
@@ -60,4 +61,44 @@ func MutliChannel() {
 
 	wg.Wait() // 等待所有 Goroutine 完成
 	close(ch) // 关闭通道
+}
+
+var wg sync.WaitGroup
+
+func OrderPrint() {
+	ch1 := make(chan struct{}, 3)
+	ch2 := make(chan struct{}, 3)
+	ch3 := make(chan struct{}, 3)
+
+	ch1 <- struct{}{}
+
+	wg.Add(3)
+
+	start := time.Now().Unix()
+
+	go printThis("goroutine 1", ch1, ch2)
+	go printThis("goroutine 2", ch2, ch3)
+	go printThis("goroutine 3", ch3, ch1)
+
+	wg.Wait()
+
+	end := time.Now().Unix()
+
+	fmt.Println(end - start)
+
+}
+
+func printThis(goStr string, inputchan chan struct{}, outchan chan struct{}) {
+	time.Sleep(2 * time.Second)
+	select {
+	case <-inputchan:
+		fmt.Println(goStr)
+		outchan <- struct{}{}
+	}
+	wg.Done()
+
+}
+
+func deadlock() {
+
 }

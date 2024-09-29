@@ -125,7 +125,7 @@ func zkx() (int, int) {
 }
 
 func main() {
-	MutliChannel()
+	OrderPrint()
 }
 
 func httpServer(port int) {
