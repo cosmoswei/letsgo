@@ -2,8 +2,8 @@ package main
 
 import (
 	"database/sql"
-	_ "database/sql"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"net/http"
 	"time"
@@ -28,6 +28,7 @@ const (
 	k
 	l
 )
+
 const (
 	m = 2
 	n
@@ -35,6 +36,7 @@ const (
 	p
 	q
 )
+
 const xxxx = "zsdsaczxc"
 
 func demo() {
@@ -123,7 +125,7 @@ func zkx() (int, int) {
 }
 
 func main() {
-	httpServer(8090)
+	Router(8090)
 }
 
 func httpServer(port int) {
@@ -150,7 +152,7 @@ func operDateBase() {
             CREATE TABLE users (
                 id INT AUTO_INCREMENT,
                 username TEXT NOT NULL,
-                password TEXT NOT NULL,
+                Password TEXT NOT NULL,
                 created_at DATETIME,
                 PRIMARY KEY (id)
             );`
@@ -163,7 +165,7 @@ func operDateBase() {
 			password := "secret"
 			createdAt := time.Now()
 
-			result, err := db.Exec(`INSERT INTO users (username, password, created_at) VALUES (?, ?, ?)`, username, password, createdAt)
+			result, err := db.Exec(`INSERT INTO users (username, Password, created_at) VALUES (?, ?, ?)`, username, password, createdAt)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -173,5 +175,4 @@ func operDateBase() {
 		}
 
 	}
-
 }
