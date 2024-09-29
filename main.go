@@ -125,7 +125,7 @@ func zkx() (int, int) {
 }
 
 func main() {
-	OrderPrint()
+	Deadlock6()
 }
 
 func httpServer(port int) {

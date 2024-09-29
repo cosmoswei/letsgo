@@ -99,6 +99,63 @@ func printThis(goStr string, inputchan chan struct{}, outchan chan struct{}) {
 
 }
 
-func deadlock() {
+func Deadlock1() {
+	ch := make(chan int)
+	ch <- 3
+}
 
+func Deadlock2() {
+	ch := make(chan int)
+	ch <- 3
+	nums := <-ch
+	fmt.Println("nums", nums)
+}
+
+func Deadlock3() {
+	ch := make(chan int)
+	ch <- 100
+	go func() {
+		num := <-ch
+		fmt.Println("num", num)
+	}()
+
+	time.Sleep(2 * time.Second)
+}
+
+func Deadlock4() {
+	ch := make(chan int, 3)
+	ch <- 1
+	ch <- 2
+	ch <- 3
+	ch <- 4
+	close(ch)
+}
+
+func Deadlock5() {
+	ch := make(chan int)
+	fmt.Println(<-ch)
+}
+
+func Deadlock6() {
+	ch1 := make(chan int)
+	ch2 := make(chan int)
+
+	go func() {
+		for {
+			select {
+			case num := <-ch1:
+				fmt.Println(num)
+				ch2 <- 100
+			}
+
+		}
+	}()
+
+	for {
+		select {
+		case num := <-ch2:
+			fmt.Println(num)
+			ch1 <- 300
+		}
+	}
 }
