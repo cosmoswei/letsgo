@@ -125,7 +125,7 @@ func zkx() (int, int) {
 }
 
 func main() {
-	Router(8090)
+	ConcurrencySafe()
 }
 
 func httpServer(port int) {
