@@ -125,7 +125,7 @@ func zkx() (int, int) {
 }
 
 func main() {
-	Deadlock6()
+	GcTrace()
 }
 
 func httpServer(port int) {
