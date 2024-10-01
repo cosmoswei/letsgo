@@ -27,7 +27,7 @@ func WebSocket(port int) {
 				return
 			}
 
-			fmt.Println("%s sent :%s \n", string(msg))
+			fmt.Printf("%s sent :%s \n\n", "", string(msg))
 
 			if err := conn.WriteMessage(messageType, msg); err != nil {
 				log.Println(err)

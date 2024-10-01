@@ -8,7 +8,7 @@ import (
 
 func Gc() {
 
-	//  GODEBUG='gctrace1' go run main.go
+	//  GODEBUG='gctrace1' go run demo_gin.go
 	for i := 0; i < 100000; i++ {
 		_ = make([]byte, 1<<20)
 	}

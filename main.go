@@ -2,10 +2,15 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	_ "letsgo/gin"
 	"log"
+	"math/rand"
 	"net/http"
+	"strconv"
+	"sync"
 	"time"
 )
 
@@ -125,7 +130,145 @@ func zkx() (int, int) {
 }
 
 func main() {
-	GcTrace()
+	Context()
+}
+
+func BaseExample() {
+	m1 := make(map[string]int)
+	m2 := m1
+	m1["ko"] = 100
+	m2["ok"] = 200
+
+	m3 := map[string]int{
+		"ss": 11,
+		"bb": 22,
+	}
+	fmt.Println(m1, m2)
+
+	str := "golang"
+	var p *string = &str
+	*p = "hello"
+	fmt.Println(str)
+
+	for k, v := range m3 {
+		fmt.Println(k, v)
+	}
+
+	nums := []int{1, 2, 3, 4, 5}
+
+	for i := 0; i < len(nums); i++ {
+		fmt.Println(nums[i])
+	}
+
+	for i := 0; i <= 20; i++ {
+		func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					fmt.Println("捕获到 panic:", r, i)
+				}
+			}()
+			err, _ := maybeError()
+			fmt.Println(err)
+		}(i)
+	}
+
+	stu := &Student{
+		Name: "huangxuwei", Age: 25,
+	}
+	fmt.Println(stu)
+	fmt.Println(stu.hello("ni da ye"))
+
+	stu2 := new(Student)
+	stu2.Name = "huangxuwei"
+	stu2.Age = 25
+	fmt.Println(stu2.hello("bob"))
+
+	var stu3 Human = &Student{
+		Name: "zhansan", Age: 25,
+	}
+
+	fmt.Println(stu3.getName())
+
+	m := make(map[string]interface{})
+	m["name"] = "huangxuwei"
+	m["age"] = 25
+	m["subject"] = [3]string{"english", "math", "chinese"}
+	m["sroce"] = [3]int{99, 100, 99}
+	fmt.Println(m)
+
+	for i := 0; i < 6; i++ {
+		downWg.Add(1)
+		go download("a.com/" + strconv.Itoa(i))
+	}
+	downWg.Wait()
+	fmt.Println("done")
+
+	for i := 0; i < 6; i++ {
+		go downloadFromCh("a.com/" + strconv.Itoa(i))
+	}
+
+	for i := 0; i < 6; i++ {
+		msg := <-ch
+		fmt.Println(msg)
+	}
+}
+
+var downWg = sync.WaitGroup{}
+
+var ch = make(chan string)
+
+func download(url string) {
+	rand.Seed(time.Now().UnixNano())
+	second := rand.Intn(5)
+	fmt.Println(" start to download ", url)
+	time.Sleep(time.Second * time.Duration(second))
+	downWg.Done()
+}
+
+func downloadFromCh(url string) {
+	rand.Seed(time.Now().UnixNano())
+	second := rand.Intn(5)
+	time.Sleep(time.Second * time.Duration(second))
+	ch <- url
+}
+
+func (stu *Student) hello(person string) string {
+	return fmt.Sprintf("hello, %s! i am %s  and i am %d", person, stu.Name, stu.Age)
+}
+
+type Human interface {
+	getName() string
+}
+
+type Worker struct {
+	name   string
+	gender string
+}
+
+func (w Worker) getName() string {
+	return w.name
+}
+
+type Student struct {
+	Name string
+	Age  int
+}
+
+func (stu *Student) getName() string {
+	return stu.Name
+}
+
+func maybeError() (error, string) {
+	// 设置随机数种子
+	rand.Seed(time.Now().UnixNano())
+	// 生成一个 0 到 99 的随机整数
+	randomInt := rand.Intn(99)
+
+	if randomInt%2 == 0 {
+		panic("is even ")
+	} else {
+		return errors.New("is old"), ""
+	}
 }
 
 func httpServer(port int) {
@@ -136,7 +279,7 @@ func httpServer(port int) {
 	http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 }
 
-func operDateBase() {
+func operaDateBase() {
 	db, err := sql.Open("mySQl", "root:root@tcp(127.0.0.1:3306)/test?charset=utf8")
 	if err != nil {
 		log.Fatal(err)
