@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
@@ -9,9 +10,11 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"reflect"
 	"strconv"
 	"sync"
 	"time"
+	"unsafe"
 )
 
 var name string = " lisi"
@@ -130,7 +133,183 @@ func zkx() (int, int) {
 }
 
 func main() {
-	Context()
+	name := "飞雪无情"
+
+	nameP := &name //取地址
+
+	fmt.Println("name变量的值为:", name)
+
+	fmt.Println("name变量的内存地址为:", nameP)
+
+	*nameP = "huangxuwei"
+
+	fmt.Println("name变量的值为:", name)
+
+	i2 := new(int)
+
+	var intP *int
+
+	intP = new(int)
+
+	*intP = 10
+
+	fmt.Println(*i2)
+
+	i := 3
+	of := reflect.ValueOf(i)
+	typeOf := reflect.TypeOf(i)
+	fmt.Println(of, typeOf)
+	p := Person{"huangxuwei", 25}
+	marshal, err := json.Marshal(p)
+	if err == nil {
+		fmt.Println(string(marshal))
+	}
+
+	respJson := "{\"Name\":\"huangxuwei\",\"Age\":25}"
+	json.Unmarshal([]byte(respJson), &p)
+	fmt.Println(p)
+
+	x := 10
+	ip := &x
+	f2 := (*float64)(unsafe.Pointer(ip))
+	i3 := *f2 * 3
+	fmt.Println(i3)
+
+	fmt.Println(unsafe.Sizeof(true))
+
+	fmt.Println(unsafe.Sizeof(int8(0)))
+
+	fmt.Println(unsafe.Sizeof(int16(10)))
+
+	fmt.Println(unsafe.Sizeof(int32(10000000)))
+
+	fmt.Println(unsafe.Sizeof(int64(10000000000000)))
+
+	fmt.Println(unsafe.Sizeof(int(10000000000000000)))
+
+	fmt.Println(unsafe.Sizeof(string("飞雪无情")))
+
+	fmt.Println(unsafe.Sizeof([]string{"飞雪u无情", "张三"}))
+
+	arr := []int{1, 2, 3, 4, 5}
+	arr = append(arr, 2)
+	arr = append(arr, 3)
+	fmt.Println(len(arr), cap(arr))
+	extendSlice()
+	s := "飞雪无情"
+	fmt.Printf("s的内存地址：%d\n", (*reflect.StringHeader)(unsafe.Pointer(&s)).Data)
+	b := []byte(s)
+	fmt.Printf("b的内存地址：%d\n", (*reflect.SliceHeader)(unsafe.Pointer(&b)).Data)
+	s3 := string(b)
+	fmt.Printf("s3的内存地址：%d\n", (*reflect.StringHeader)(unsafe.Pointer(&s3)).Data)
+}
+
+func init() {
+
+	fmt.Println("init in main.go ")
+
+}
+
+func extendSlice() {
+	arr2 := make([]float64, 3, 5)
+	arr2 = append(arr2, 1, 2, 3, 4)
+	fmt.Println(arr2, len(arr2), cap(arr2)) // 5 10
+
+	slice2 := make([]float32, 3, 5)               // [0 0 0] 长度为3容量为5的切片
+	slice2 = append(slice2, 1, 2, 3, 4)           // [0, 0, 0, 1, 2, 3, 4]
+	fmt.Println(slice2, len(slice2), cap(slice2)) // 7 12
+}
+
+func doOnce() {
+	var once sync.Once
+	onceBody := func() {
+		fmt.Println("Only once")
+	}
+
+	//用于等待协程执行完毕
+	done := make(chan bool)
+
+	//启动10个协程执行once.Do(onceBody)
+	for i := 0; i < 10; i++ {
+		go func() {
+			//把要执行的函数(方法)作为参数传给once.Do方法即可
+			once.Do(onceBody)
+			done <- true
+		}()
+	}
+
+	for i := 0; i < 10; i++ {
+		<-done
+	}
+}
+
+// 10个人赛跑，1个裁判发号施令
+func race() {
+
+	cond := sync.NewCond(&sync.Mutex{})
+	var wg sync.WaitGroup
+	wg.Add(11)
+
+	for i := 0; i < 10; i++ {
+		go func(num int) {
+			defer wg.Done()
+			fmt.Println(num, "号已经就位")
+			cond.L.Lock()
+			cond.Wait() //等待发令枪响
+			fmt.Println(num, "号开始跑……")
+			cond.L.Unlock()
+		}(i)
+	}
+
+	//等待所有goroutine都进入wait状态
+	time.Sleep(2 * time.Second)
+
+	go func() {
+		defer wg.Done()
+		fmt.Println("裁判已经就位，准备发令枪")
+		fmt.Println("比赛开始，大家准备跑")
+		cond.Broadcast() //发令枪响
+	}()
+	//防止函数提前返回退出
+	wg.Wait()
+}
+func channel() {
+
+	//声明三个存放结果的channel
+	firstCh := make(chan string)
+	secondCh := make(chan string)
+	threeCh := make(chan string)
+
+	//同时开启3个goroutine下载
+	go func() {
+		firstCh <- downloadFile("firstCh")
+	}()
+
+	go func() {
+		secondCh <- downloadFile("secondCh")
+	}()
+
+	go func() {
+		threeCh <- downloadFile("threeCh")
+	}()
+
+	//开始select多路复用，哪个channel能获取到值，
+	//就说明哪个最先下载好，就用哪个。
+	select {
+	case filePath := <-firstCh:
+		fmt.Println(filePath)
+	case filePath := <-secondCh:
+		fmt.Println(filePath)
+	case filePath := <-threeCh:
+		fmt.Println(filePath)
+	}
+}
+
+func downloadFile(chanName string) string {
+
+	//模拟下载文件,可以自己随机time.Sleep点时间试试
+	time.Sleep(time.Second)
+	return chanName + ":filePath"
 }
 
 func BaseExample() {

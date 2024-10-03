@@ -108,3 +108,12 @@ func Select() {
 		fmt.Println("No message received")
 	}
 }
+
+type commonError struct {
+	errorCode int
+	message   string
+}
+
+func (e *commonError) Error() string {
+	return e.message
+}
