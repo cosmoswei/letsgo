@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"letsgo/gin"
 	_ "letsgo/gin"
 	"log"
 	"math/rand"
@@ -134,7 +133,92 @@ func zkx() (int, int) {
 }
 
 func main() {
-	gin.ServerStart()
+	orderPrint2()
+}
+
+func orderPrint2() {
+	var wg sync.WaitGroup
+
+	// 创建4个channel，用来控制4个goroutine的顺序
+	ch1 := make(chan struct{})
+	ch2 := make(chan struct{})
+	ch3 := make(chan struct{})
+	ch4 := make(chan struct{})
+
+	// 启动4个goroutine，编号分别为1、2、3、4
+	wg.Add(4)
+	go printNumber(1, ch1, ch2, &wg) // goroutine 1
+	go printNumber(2, ch2, ch3, &wg) // goroutine 2
+	go printNumber(3, ch3, ch4, &wg) // goroutine 3
+	go printNumber(4, ch4, ch1, &wg) // goroutine 4
+
+	// 启动时，先给第一个goroutine发送启动信号
+	ch1 <- struct{}{}
+
+	// 防止主程序过早退出，等待goroutine执行
+	wg.Wait()
+}
+
+func printNumber(id int, currentChan, nextChan chan struct{}, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	for {
+		<-currentChan               // 等待信号
+		fmt.Println(id)             // 打印自己的编号
+		time.Sleep(1 * time.Second) // 每秒打印一次
+		nextChan <- struct{}{}      // 通知下一个 goroutine 开始
+	}
+}
+
+func orderPrint() {
+	c1 := make(chan bool, 1)
+	c2 := make(chan bool, 1)
+	c3 := make(chan bool, 1)
+	c4 := make(chan bool, 1)
+	round := 3
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		for {
+			<-c1
+			fmt.Println("1")
+			time.Sleep(time.Second)
+			c2 <- true
+		}
+	}()
+	go func() {
+		for {
+			<-c2
+			fmt.Println("2")
+			time.Sleep(time.Second)
+			c3 <- true
+		}
+	}()
+	go func() {
+		for {
+			<-c3
+			fmt.Println("3")
+			time.Sleep(time.Second)
+			c4 <- true
+		}
+	}()
+	go func() {
+		for {
+			<-c4
+			fmt.Println("4")
+			time.Sleep(time.Second)
+			round--
+			if round <= 0 {
+				close(c1)
+				wg.Done()
+				return
+			}
+			c1 <- true
+		}
+	}()
+	c1 <- true
+	wg.Wait()
+	fmt.Println("print is finished")
 }
 
 // https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/Go%20%E8%AF%AD%E8%A8%80%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98
