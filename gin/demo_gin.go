@@ -138,6 +138,23 @@ func ServerStart() {
 		authorized.POST("/submit", func(c *gin.Context) {})
 	}
 
+	r.POST("/json", func(c *gin.Context) {
+		var stu3 student
+		err := c.ShouldBind(&stu3)
+		if err != nil {
+			fmt.Println("出错了", stu3)
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		fmt.Printf("received stu is %v\n", stu3)
+		fmt.Println()
+		c.JSON(http.StatusOK, gin.H{
+			"message": "ok",
+			"name":    stu3.Name,
+			"age":     stu3.Age,
+		})
+	})
+
 	r.Run(":8090")
 }
 

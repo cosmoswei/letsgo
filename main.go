@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"letsgo/gin"
 	_ "letsgo/gin"
 	"log"
 	"math/rand"
@@ -133,6 +134,11 @@ func zkx() (int, int) {
 }
 
 func main() {
+	gin.ServerStart()
+}
+
+// https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/Go%20%E8%AF%AD%E8%A8%80%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98
+func project() {
 	name := "飞雪无情"
 
 	nameP := &name //取地址
