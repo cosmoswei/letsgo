@@ -1,6 +1,6 @@
 package main
 
-func Add(num int, num2 int) int {
+func AddTest(num int, num2 int) int {
 	return num + num2
 }
 

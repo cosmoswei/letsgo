@@ -155,6 +155,20 @@ func ServerStart() {
 		})
 	})
 
+	r.NoRoute(func(c *gin.Context) {
+		c.HTML(http.StatusBadRequest, "404.html", nil)
+	})
+
+	r.LoadHTMLGlob("gin/templates/*")
+
+	//// 处理所有未匹配的路由
+	//r.NoRoute(func(c *gin.Context) {
+	//	// 返回JSON格式的错误信息
+	//	c.JSON(http.StatusNotFound, gin.H{
+	//		"message": "Page not found",
+	//	})
+	//})
+
 	r.Run(":8090")
 }
 

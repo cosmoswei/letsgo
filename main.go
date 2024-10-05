@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"golang.org/x/exp/constraints"
 	_ "letsgo/gin"
 	"log"
 	"math/rand"
@@ -132,8 +133,194 @@ func zkx() (int, int) {
 	return 1, 2
 }
 
+func Describe(i interface{}) {
+	fmt.Printf("Value: %v, Type: %T\n", i, i)
+}
+
+// 定义一个泛型类型，T 是类型参数
+type Stack[T any] struct {
+	elements []T
+}
+
+// 为泛型类型定义方法
+func (s *Stack[T]) Push(element T) {
+	s.elements = append(s.elements, element)
+}
+
+func (s *Stack[T]) Pop() T {
+	n := len(s.elements)
+	element := s.elements[n-1]
+	s.elements = s.elements[:n-1]
+	return element
+}
+
+// 泛型函数，T 是类型参数
+func PrintSlice[T any](s []T) {
+	for _, v := range s {
+		fmt.Println(v)
+	}
+}
+
+// AddTest 函数，约束 T 只能是数字类型
+func Add[T constraints.Ordered](a, b T) T {
+	return a + b
+}
+
+// 定义一个函数，接收两个不同的类型参数
+func Swap[T, U any](a T, b U) (U, T) {
+	return b, a
+}
+
+// 使用泛型函数求最小值
+func Min[T constraints.Ordered](a, b T) T {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+// 定义泛型 List
+type List[T any] struct {
+	items []T
+}
+
+func (l *List[T]) Add(item T) {
+	l.items = append(l.items, item)
+}
+
+func (l *List[T]) Get(index int) T {
+	return l.items[index]
+}
+
 func main() {
-	orderPrint2()
+	// 使用泛型函数
+	intSlice := []int{1, 2, 3}
+	stringSlice := []string{"Hello", "World"}
+
+	PrintSlice(intSlice)    // 输出: 1 2 3
+	PrintSlice(stringSlice) // 输出: Hello World
+
+	// 使用泛型类型 Stack
+	intStack := Stack[int]{}
+	intStack.Push(1)
+	intStack.Push(2)
+	fmt.Println(intStack.Pop()) // 输出: 2
+	stringStack := Stack[string]{}
+	stringStack.Push("Go")
+	stringStack.Push("Generics")
+	fmt.Println(stringStack.Pop()) // 输出: Generics
+
+	fmt.Println(Add(3, 4))     // 输出: 7
+	fmt.Println(Add(2.5, 3.5)) // 输出: 6
+
+	x, y := Swap(1, "Go")
+	fmt.Println(x, y) // 输出: Go 1
+
+	fmt.Println(Min(10, 20))       // 输出: 10
+	fmt.Println(Min(3.5, 2.5))     // 输出: 2.5
+	fmt.Println(Min("Go", "Java")) // 输出: Go
+
+	intList := List[int]{}
+	intList.Add(1)
+	intList.Add(2)
+	fmt.Println(intList.Get(1)) // 输出: 2
+
+	stringList := List[string]{}
+	stringList.Add("Hello")
+	stringList.Add("Go")
+	fmt.Println(stringList.Get(0)) // 输出: Hello
+}
+
+func InterfaceDemo() {
+	Describe(42)
+	Describe("hello")
+	Describe(true)
+
+	var i interface{} = "hello"
+	s := i.(string)
+	fmt.Println(s) // 输出: hello
+
+	var i2 interface{} = 2
+	s, ok := i2.(string)
+	if ok {
+		fmt.Println(s)
+	} else {
+		fmt.Println("类型断言失败")
+	}
+
+	var s2 Shape
+
+	s2 = Circle{Radius: 5}
+	fmt.Println("Circle Area:", s2.Area())
+	fmt.Println("Circle Perimeter:", s2.Perimeter())
+
+	s2 = Rectangle{Width: 3, Height: 4}
+	fmt.Println("Rectangle Area:", s2.Area())
+	fmt.Println("Rectangle Perimeter:", s2.Perimeter())
+}
+
+type Shape interface {
+	Area() float64
+	Perimeter() float64
+}
+
+type Circle struct {
+	Radius float64
+}
+
+func (c Circle) Area() float64 {
+	return 3.14 * c.Radius * c.Radius
+}
+
+func (c Circle) Perimeter() float64 {
+	return 2 * 3.14 * c.Radius
+}
+
+type Rectangle struct {
+	Width, Height float64
+}
+
+func (r Rectangle) Area() float64 {
+	return r.Width * r.Height
+}
+
+func (r Rectangle) Perimeter() float64 {
+	return 2 * (r.Width + r.Height)
+}
+
+func TypeCheck(i interface{}) {
+	switch v := i.(type) {
+	case string:
+		fmt.Printf("i 是字符串: %s\n", v)
+	case int:
+		fmt.Printf("i 是整数: %d\n", v)
+	default:
+		fmt.Printf("未知类型: %T\n", v)
+	}
+}
+
+type Reader interface {
+	Read(p []byte) (n int, err error)
+}
+
+type Writer interface {
+	Write(p []byte) (n int, err error)
+}
+
+type ReadWriter interface {
+	Reader
+	Writer
+}
+
+type PP struct {
+	Role string
+}
+
+func (c PP) Write(p []byte) (n int, err error) {
+	panic("")
+}
+func (c PP) Read(p []byte) (n int, err error) {
+	panic("")
 }
 
 func orderPrint2() {
