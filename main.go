@@ -193,6 +193,10 @@ func (l *List[T]) Get(index int) T {
 }
 
 func main() {
+	extendLen()
+}
+
+func generic() {
 	// 使用泛型函数
 	intSlice := []int{1, 2, 3}
 	stringSlice := []string{"Hello", "World"}
