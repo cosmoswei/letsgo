@@ -476,7 +476,7 @@ func project() {
 	arr = append(arr, 2)
 	arr = append(arr, 3)
 	fmt.Println(len(arr), cap(arr))
-	extendSlice()
+	extendSliceErr()
 	s := "飞雪无情"
 	fmt.Printf("s的内存地址：%d\n", (*reflect.StringHeader)(unsafe.Pointer(&s)).Data)
 	b := []byte(s)
@@ -491,7 +491,7 @@ func init() {
 
 }
 
-func extendSlice() {
+func extendSliceErr() {
 	arr2 := make([]float64, 3, 5)
 	arr2 = append(arr2, 1, 2, 3, 4)
 	fmt.Println(arr2, len(arr2), cap(arr2)) // 5 10
