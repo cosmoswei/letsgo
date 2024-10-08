@@ -8,10 +8,12 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/exp/constraints"
 	_ "letsgo/gin"
+	"letsgo/grpc"
 	"log"
 	"math/rand"
 	"net/http"
 	"reflect"
+	"runtime"
 	"strconv"
 	"sync"
 	"time"
@@ -192,8 +194,192 @@ func (l *List[T]) Get(index int) T {
 	return l.items[index]
 }
 
+type Project struct{}
+
+func (p *Project) deferError() {
+	if err := recover(); err != nil {
+		fmt.Println("recover: ", err)
+	}
+}
+func (p *Project) exec(msgchan chan interface{}) {
+	defer p.deferError()
+	for msg := range msgchan {
+		m := msg.(int)
+		fmt.Println("msg: ", m)
+	}
+}
+func (p *Project) run(msgchan chan interface{}) {
+	for {
+		go p.exec(msgchan)
+		time.Sleep(time.Second * 2)
+	}
+}
+func (p *Project) Main() {
+	a := make(chan interface{}, 100)
+	go p.run(a)
+	go func() {
+		for {
+			a <- "1"
+			time.Sleep(time.Second)
+		}
+	}()
+	time.Sleep(time.Second * 20)
+}
 func main() {
-	extendLen()
+	grpc.GrpcRun()
+}
+func Interview() {
+	//p := new(Project)
+	//p.Main()
+	extendSliceErr()
+	fmt.Println(live(), " World")
+	fmt.Println(a1, b2, name1, c3)
+
+	str1 := []string{"a", "b", "c"}
+	str2 := str1[1:]
+	str2[1] = "new"
+	fmt.Println(str1)
+	str2 = append(str2, "z", "x", "y")
+	fmt.Println(str1)
+	fmt.Println(&Student{Name: "menglu"} == &Student{Name: "menglu"})
+	fmt.Println(Student{Name: "menglu"} == Student{Name: "menglu"})
+	fmt.Println([...]string{"1"} == [...]string{"1"})
+	//fmt.Println([]string{"1"} == []string{"1"})
+
+	chain = "main"
+	////A()
+	fmt.Println(chain)
+
+	//var wg2 sync.WaitGroup
+	//wg2.Add(1)
+	//go func() {
+	//	time.Sleep(time.Second * 2)
+	//	wg2.Done()
+	//	wg2.Add(1)
+	//}()
+	//wg2.Wait()
+
+	//var mu MyMutex
+	//mu.Lock()
+	//var mu2 = mu
+	//mu.count++
+	//mu.Unlock()
+	//mu2.Lock()
+	//mu2.count++
+	//mu2.Unlock()
+	//fmt.Println(mu.count, mu2.count)
+
+	//var ch chan int
+	//var count int
+	//go func() {
+	//	ch <- 1
+	//}()
+	//go func() {
+	//	count++
+	//	time.Sleep(1 * time.Second)
+	//	close(ch)
+	//}()
+	//<-ch
+	//fmt.Println(count)
+}
+
+type MyMutex struct {
+	sync.Mutex
+	count int
+}
+
+var mu = sync.Mutex{}
+var chain string
+
+func A() {
+	mu.Lock()
+	defer mu.Unlock()
+	chain = chain + " --> A"
+	B()
+}
+func B() {
+	chain = chain + " --> B"
+	C()
+}
+func C() {
+	mu.Lock()
+	defer mu.Unlock()
+	chain = chain + " --> C"
+}
+
+const (
+	a1 = iota
+	b2 = iota
+)
+
+const (
+	name1 = "huangxuwei"
+	name2 = "huangxuwei"
+	c3    = iota
+	d4    = iota
+)
+
+type People interface {
+	Show()
+}
+
+type Student2 struct {
+}
+
+func (student *Student2) Show() {
+}
+
+func live() People {
+	var stu Student2
+	return &stu
+}
+
+type student struct {
+	Name string
+	Age  int
+}
+
+func pase_student() {
+	m := make(map[string]*student)
+	stus := []student{
+		{Name: "zhou", Age: 24},
+		{Name: "li", Age: 23},
+		{Name: "wang", Age: 22},
+	}
+	fmt.Println(stus)
+	for _, stu := range stus {
+		m[stu.Name] = &stu
+	}
+	for s, v := range m {
+		fmt.Println(s)
+		fmt.Println(v)
+	}
+}
+
+func gpmTest() {
+	runtime.GOMAXPROCS(1)
+	wg := sync.WaitGroup{}
+	wg.Add(20)
+	for i := 0; i < 10; i++ {
+		go func() {
+			fmt.Println("i: ", i)
+			wg.Done()
+		}()
+	}
+	for i := 0; i < 10; i++ {
+		go func(i int) {
+			fmt.Println("i: ", i)
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
+}
+
+func defer_Call() {
+	defer func() { fmt.Println("print first") }()
+	defer func() { fmt.Println("print second") }()
+	defer func() { fmt.Println("print third") }()
+	panic("panic")
 }
 
 func generic() {
@@ -486,9 +672,7 @@ func project() {
 }
 
 func init() {
-
 	fmt.Println("init in main.go ")
-
 }
 
 func extendSliceErr() {
