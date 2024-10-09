@@ -7,8 +7,8 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/exp/constraints"
+	"golang.org/x/net/context"
 	_ "letsgo/gin"
-	"letsgo/grpc"
 	"log"
 	"math/rand"
 	"net/http"
@@ -226,7 +226,121 @@ func (p *Project) Main() {
 	time.Sleep(time.Second * 20)
 }
 func main() {
-	grpc.GrpcRun()
+	var a uint = 0
+	var b uint = 1
+	c := a - b
+	fmt.Println(reflect.TypeOf(c))
+	fmt.Println(c)
+	ax := [3]int{1, 2, 3} // 数组
+	for k, v := range ax {
+		if k == 0 {
+			ax[0], ax[1] = 100, 200
+			fmt.Println(ax)
+		}
+		ax[k] = 100 + v
+	}
+	fmt.Println(ax)
+
+	az := []int{1, 2, 3} // 切片
+	for k, v := range az {
+		if k == 0 {
+			az[0], az[1] = 100, 200
+			fmt.Println(az)
+		}
+		az[k] = 100 + v
+	}
+	fmt.Println(az)
+
+	//var wg sync.WaitGroup
+	//c1 := make(chan bool, 1) // 用于协调 cat 的信号
+	//c2 := make(chan bool, 1) // 用于协调 dog 的信号
+	//c3 := make(chan bool, 1) // 用于协调 fish 的信号
+	//
+	//// 启动三个 goroutine
+	//wg.Add(3)
+	//go printCat(c1, c2, &wg)
+	//go printDog(c2, c3, &wg)
+	//go printFish(c3, c1, &wg)
+	//
+	//// 初始化信号
+	//c1 <- true // 让 cat goroutine 先开始
+
+	//// 等待所有 goroutine 完成
+	//wg.Wait()
+
+	//ctx, cancel := context.WithCancel(context.Background())
+	//go worker(ctx, "worker1 ")
+	//go worker(ctx, "worker2 ")
+	//time.Sleep(time.Second * 2)
+	//cancel()
+	//time.Sleep(time.Second * 1)
+
+	timeout, cancelFunc := context.WithTimeout(context.Background(), time.Second*1)
+	defer cancelFunc()
+	select {
+	case <-time.After(time.Second * 2):
+		fmt.Println("finish work")
+	case <-timeout.Done():
+		fmt.Println("timeout")
+	}
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, ctxkey("userId"), "18411100111")
+	go worker2(ctx)
+	time.Sleep(time.Second * 1)
+}
+
+type ctxkey string
+
+func worker2(ctx context.Context) {
+	value := ctx.Value(ctxkey("userId"))
+	if value != nil {
+		fmt.Println("receive a value from context, the value is ", value)
+	} else {
+		fmt.Println("no value")
+	}
+}
+
+func worker(ctx context.Context, name string) {
+	for {
+		select {
+		case <-ctx.Done():
+			fmt.Println("收到退出信号，我退出了")
+			return
+		default:
+			fmt.Println(name + "正在工作")
+			time.Sleep(time.Second)
+		}
+	}
+}
+
+func printCat(c1, c2 chan bool, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for i := 0; i < 100; i++ {
+		<-c1                              // 等待前一个信号
+		fmt.Println("cat")                // 打印 cat
+		time.Sleep(10 * time.Millisecond) // 模拟处理时间
+		c2 <- true                        // 发送信号给下一个
+	}
+}
+
+func printDog(c2, c3 chan bool, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for i := 0; i < 100; i++ {
+		<-c2               // 等待前一个信号
+		fmt.Println("dog") // 打印 dog
+		time.Sleep(10 * time.Millisecond)
+		c3 <- true // 发送信号给下一个
+	}
+}
+
+func printFish(c3, c1 chan bool, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for i := 0; i < 100; i++ {
+		<-c3                // 等待前一个信号
+		fmt.Println("fish") // 打印 fish
+		time.Sleep(10 * time.Millisecond)
+		c1 <- true // 发送信号给下一个
+	}
 }
 func Interview() {
 	//p := new(Project)
