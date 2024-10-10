@@ -9,6 +9,7 @@ import (
 	"golang.org/x/exp/constraints"
 	"golang.org/x/net/context"
 	_ "letsgo/gin"
+	"letsgo/pool"
 	"log"
 	"math/rand"
 	"net/http"
@@ -225,7 +226,12 @@ func (p *Project) Main() {
 	}()
 	time.Sleep(time.Second * 20)
 }
+
 func main() {
+	pool.PoolGo()
+}
+
+func Interview2() {
 	var a uint = 0
 	var b uint = 1
 	c := a - b
