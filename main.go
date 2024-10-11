@@ -9,7 +9,6 @@ import (
 	"golang.org/x/exp/constraints"
 	"golang.org/x/net/context"
 	_ "letsgo/gin"
-	"letsgo/pool"
 	"log"
 	"math/rand"
 	"net/http"
@@ -228,7 +227,45 @@ func (p *Project) Main() {
 }
 
 func main() {
-	pool.PoolGo()
+	strs := []string{"abc", "abcd", "aa", "100a"}
+	res := CountArrStr(strs, 2)
+	fmt.Println(res['b'])
+}
+
+type LetterFreq map[rune]int
+
+func CountArrStr(strs []string, currency int) LetterFreq {
+	res := make(map[rune]int, 7)
+	ch := make(chan string, len(strs))
+	cur := make(chan struct{}, currency)
+	wg1 := sync.WaitGroup{}
+	mu := sync.Mutex{}
+	for _, str := range strs {
+		wg1.Add(1)
+		go func(s string) {
+			defer wg1.Done()
+			cur <- struct{}{}
+			ch <- s
+			<-cur
+		}(str)
+	}
+	go func() {
+		wg1.Wait()
+		close(ch)
+	}()
+
+	for str := range ch {
+		subCount(str, res, &mu)
+	}
+
+	return LetterFreq(res)
+}
+func subCount(str string, res map[rune]int, mu *sync.Mutex) {
+	for _, char := range str {
+		mu.Lock()
+		res[char]++
+		mu.Unlock()
+	}
 }
 
 func Interview2() {
