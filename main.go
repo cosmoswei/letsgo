@@ -225,6 +225,7 @@ func (p *Project) Main() {
 }
 
 func main() {
+	orderPrint()
 	strs := []string{"abc", "abcd", "aa", "100a"}
 	res := CountArrStr(strs, 2)
 	fmt.Println(res['b'])
@@ -893,6 +894,7 @@ func race() {
 	//防止函数提前返回退出
 	wg.Wait()
 }
+
 func channel() {
 
 	//声明三个存放结果的channel

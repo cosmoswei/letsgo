@@ -16,6 +16,13 @@ func TestAdd(t *testing.T) {
 	}
 }
 
+func TestAlgo(t *testing.T) {
+	ins := []int{0, 0, 1, 1, 1, 2, 2, 3, 3, 4}
+	if ans := FindSubSize(ins); ans != 5 {
+		t.Error("err")
+	}
+}
+
 func TestMul(t *testing.T) {
 	t.Run("pos", func(t *testing.T) {
 		if Mul(2, 3) != 6 {
