@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
@@ -17,7 +16,6 @@ import (
 	"strconv"
 	"sync"
 	"time"
-	"unsafe"
 )
 
 var name string = " lisi"
@@ -756,77 +754,77 @@ func orderPrint() {
 }
 
 // https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/Go%20%E8%AF%AD%E8%A8%80%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98
-func project() {
-	name := "飞雪无情"
-
-	nameP := &name //取地址
-
-	fmt.Println("name变量的值为:", name)
-
-	fmt.Println("name变量的内存地址为:", nameP)
-
-	*nameP = "huangxuwei"
-
-	fmt.Println("name变量的值为:", name)
-
-	i2 := new(int)
-
-	var intP *int
-
-	intP = new(int)
-
-	*intP = 10
-
-	fmt.Println(*i2)
-
-	i := 3
-	of := reflect.ValueOf(i)
-	typeOf := reflect.TypeOf(i)
-	fmt.Println(of, typeOf)
-	p := Person{"huangxuwei", 25}
-	marshal, err := json.Marshal(p)
-	if err == nil {
-		fmt.Println(string(marshal))
-	}
-
-	respJson := "{\"Name\":\"huangxuwei\",\"Age\":25}"
-	json.Unmarshal([]byte(respJson), &p)
-	fmt.Println(p)
-
-	x := 10
-	ip := &x
-	f2 := (*float64)(unsafe.Pointer(ip))
-	i3 := *f2 * 3
-	fmt.Println(i3)
-
-	fmt.Println(unsafe.Sizeof(true))
-
-	fmt.Println(unsafe.Sizeof(int8(0)))
-
-	fmt.Println(unsafe.Sizeof(int16(10)))
-
-	fmt.Println(unsafe.Sizeof(int32(10000000)))
-
-	fmt.Println(unsafe.Sizeof(int64(10000000000000)))
-
-	fmt.Println(unsafe.Sizeof(int(10000000000000000)))
-
-	fmt.Println(unsafe.Sizeof(string("飞雪无情")))
-
-	fmt.Println(unsafe.Sizeof([]string{"飞雪u无情", "张三"}))
-
-	arr := []int{1, 2, 3, 4, 5}
-	arr = append(arr, 2)
-	arr = append(arr, 3)
-	fmt.Println(len(arr), cap(arr))
-	extendSliceErr()
-	s := "飞雪无情"
-	fmt.Printf("s的内存地址：%d\n", (*reflect.StringHeader)(unsafe.Pointer(&s)).Data)
-	b := []byte(s)
-	fmt.Printf("b的内存地址：%d\n", (*reflect.SliceHeader)(unsafe.Pointer(&b)).Data)
-	s3 := string(b)
-	fmt.Printf("s3的内存地址：%d\n", (*reflect.StringHeader)(unsafe.Pointer(&s3)).Data)
-}
+//func project() {
+//	name := "飞雪无情"
+//
+//	nameP := &name //取地址
+//
+//	fmt.Println("name变量的值为:", name)
+//
+//	fmt.Println("name变量的内存地址为:", nameP)
+//
+//	*nameP = "huangxuwei"
+//
+//	fmt.Println("name变量的值为:", name)
+//
+//	i2 := new(int)
+//
+//	var intP *int
+//
+//	intP = new(int)
+//
+//	*intP = 10
+//
+//	fmt.Println(*i2)
+//
+//	i := 3
+//	of := reflect.ValueOf(i)
+//	typeOf := reflect.TypeOf(i)
+//	fmt.Println(of, typeOf)
+//	p := Person{"huangxuwei", 25}
+//	marshal, err := json.Marshal(p)
+//	if err == nil {
+//		fmt.Println(string(marshal))
+//	}
+//
+//	respJson := "{\"Name\":\"huangxuwei\",\"Age\":25}"
+//	json.Unmarshal([]byte(respJson), &p)
+//	fmt.Println(p)
+//
+//	x := 10
+//	ip := &x
+//	f2 := (*float64)(unsafe.Pointer(ip))
+//	i3 := *f2 * 3
+//	fmt.Println(i3)
+//
+//	fmt.Println(unsafe.Sizeof(true))
+//
+//	fmt.Println(unsafe.Sizeof(int8(0)))
+//
+//	fmt.Println(unsafe.Sizeof(int16(10)))
+//
+//	fmt.Println(unsafe.Sizeof(int32(10000000)))
+//
+//	fmt.Println(unsafe.Sizeof(int64(10000000000000)))
+//
+//	fmt.Println(unsafe.Sizeof(int(10000000000000000)))
+//
+//	fmt.Println(unsafe.Sizeof(string("飞雪无情")))
+//
+//	fmt.Println(unsafe.Sizeof([]string{"飞雪u无情", "张三"}))
+//
+//	arr := []int{1, 2, 3, 4, 5}
+//	arr = append(arr, 2)
+//	arr = append(arr, 3)
+//	fmt.Println(len(arr), cap(arr))
+//	extendSliceErr()
+//	s := "飞雪无情"
+//	fmt.Printf("s的内存地址：%d\n", (*reflect.StringHeader)(unsafe.Pointer(&s)).Data)
+//	b := []byte(s)
+//	fmt.Printf("b的内存地址：%d\n", (*reflect.SliceHeader)(unsafe.Pointer(&b)).Data)
+//	s3 := string(b)
+//	fmt.Printf("s3的内存地址：%d\n", (*reflect.StringHeader)(unsafe.Pointer(&s3)).Data)
+//}
 
 func init() {
 	fmt.Println("init in main.go ")
