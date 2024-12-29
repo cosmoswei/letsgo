@@ -7,6 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/exp/constraints"
 	"golang.org/x/net/context"
+	"letsgo/gin"
 	_ "letsgo/gin"
 	"log"
 	"math/rand"
@@ -225,10 +226,7 @@ func (p *Project) Main() {
 }
 
 func main() {
-	orderPrint()
-	strs := []string{"abc", "abcd", "aa", "100a"}
-	res := CountArrStr(strs, 2)
-	fmt.Println(res['b'])
+	gin.FastWeb()
 }
 
 type LetterFreq map[rune]int
