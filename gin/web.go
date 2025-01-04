@@ -3,6 +3,7 @@ package gin
 import (
 	"fmt"
 	"github.com/valyala/fasthttp"
+	"log"
 	"net/http"
 	"time"
 )
@@ -52,5 +53,28 @@ func FastWeb() {
 	fmt.Println("Starting server on port 8088...")
 	if err := server.ListenAndServe(":8088"); err != nil {
 		fmt.Printf("Error starting server: %v\n", err)
+	}
+}
+
+func PingPongWeb() {
+	// 定义请求处理函数
+	requestHandler := func(ctx *fasthttp.RequestCtx) {
+		switch string(ctx.Path()) {
+		case "/ping":
+			// 设置响应内容
+			ctx.SetContentType("text/plain; charset=utf-8")
+			ctx.SetStatusCode(fasthttp.StatusOK)
+			ctx.SetBodyString("pong")
+		default:
+			// 处理未知路径
+			ctx.Error("unsupported path", fasthttp.StatusNotFound)
+		}
+	}
+
+	// 启动服务器
+	port := ":8086"
+	log.Printf("Server is running at http://localhost%s/ping", port)
+	if err := fasthttp.ListenAndServe(port, requestHandler); err != nil {
+		log.Fatalf("Error in ListenAndServe: %s", err)
 	}
 }

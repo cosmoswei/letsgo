@@ -226,7 +226,7 @@ func (p *Project) Main() {
 }
 
 func main() {
-	gin.FastWeb()
+	gin.PingPongWeb()
 }
 
 type LetterFreq map[rune]int
