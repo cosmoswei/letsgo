@@ -72,7 +72,7 @@ func PingPongWeb() {
 	}
 
 	// 启动服务器
-	port := ":8086"
+	port := ":8085"
 	log.Printf("Server is running at http://localhost%s/ping", port)
 	if err := fasthttp.ListenAndServe(port, requestHandler); err != nil {
 		log.Fatalf("Error in ListenAndServe: %s", err)
