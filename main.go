@@ -226,6 +226,15 @@ func (p *Project) Main() {
 }
 
 func main() {
+	// 获取当前可用的处理器核心数
+	availableProcessors := runtime.NumCPU()
+	fmt.Printf("Available processors: %d\n", availableProcessors)
+
+	// 设置程序最大使用的处理器数量
+	runtime.GOMAXPROCS(100)
+	// 获取当前的处理器数量
+	fmt.Printf("Available processors: %d\n", runtime.GOMAXPROCS(-1))
+
 	gin.PingPongWeb()
 }
 
